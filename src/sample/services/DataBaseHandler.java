@@ -2,6 +2,7 @@ package sample.services;
 import sample.data.Configs;
 import sample.models.*;
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 public class DataBaseHandler extends Configs {
@@ -343,6 +344,32 @@ public class DataBaseHandler extends Configs {
             e.printStackTrace();
         }
         return allBookHistory;
+    }
+
+    public List<String> getBookNamesBorrowedToMuch(int clientId, java.sql.Date criticalDate){
+
+        String getToMuchBorrowedBookNames = "SELECT book.name FROM book " +
+                "JOIN book_account ON book.id=book_account.bookId " +
+                "JOIN client ON client.id=book_account.clientId " +
+                "WHERE client.id=?" +
+                " AND book_account.date < ?";
+        System.out.println(getToMuchBorrowedBookNames);
+        ResultSet bookNamesSet;
+        List<String> bookNames = new ArrayList<>();
+        PreparedStatement prSt = null;
+        try {
+            prSt = getDbConnection().prepareStatement(getToMuchBorrowedBookNames);
+            prSt.setInt(1,clientId);
+            prSt.setDate(2,criticalDate);
+            bookNamesSet = prSt.executeQuery();
+            while (bookNamesSet.next()) {
+                String bookName = bookNamesSet.getString("name");
+                bookNames.add(bookName);
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return bookNames;
     }
 }
 
