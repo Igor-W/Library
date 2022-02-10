@@ -16,7 +16,7 @@ import sample.data.Store;
 import sample.animations.Shake;
 import sample.models.User;
 
-public class Controller {
+public class AuthController {
     public DataBaseHandler dbHandler = new DataBaseHandler();
 
     @FXML
