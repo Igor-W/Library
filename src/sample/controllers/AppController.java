@@ -3,6 +3,7 @@ package sample.controllers;
 import java.io.IOException;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.*;
 
 import javafx.collections.FXCollections;
@@ -40,6 +41,10 @@ public class AppController {
     private ImageView booKImage;
     @FXML
     private AnchorPane addBookSection;
+    @FXML
+    private AnchorPane borrowNotificationSection;
+    @FXML
+    private ListView<String> booksToBeReturnedList;
     @FXML
     private AnchorPane addReviewSection;
     @FXML
@@ -217,6 +222,7 @@ public class AppController {
         authStage.setScene(scene);
         authStage.show();
     }
+
     @FXML
     private void exit() {
         toggleSections(allBooksSection);
@@ -261,6 +267,10 @@ public class AppController {
         onRadioGroupChanged();
         onAllBooksTableSearch();
         initializeUserInfo();
+        if (!user.isLibrarian()) {
+            checkBooksBorrowedToMuch();
+        }
+
     }
 
     private void onAllBooksTableSearch() {
@@ -424,4 +434,19 @@ public class AppController {
         return false;
     }
 
+    private void checkBooksBorrowedToMuch() {
+        java.util.Date now = new java.util.Date();
+        java.sql.Date sqlDate = new java.sql.Date(now.getTime());
+        Calendar c = Calendar.getInstance();
+        c.setTime(sqlDate);
+        c.add(Calendar.DATE, -7);
+        java.sql.Date criticalDate = new java.sql.Date(c.getTimeInMillis());
+        ObservableList<String> bookNames = FXCollections.observableArrayList(dbHandler.getBookNamesBorrowedToMuch(user.getId(), criticalDate));
+        if (bookNames.size() > 0) {
+            booksToBeReturnedList.setItems(bookNames);
+            booksToBeReturnedList.refresh();
+            toggleSections(borrowNotificationSection);
+        }
+
+    }
 }

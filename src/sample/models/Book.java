@@ -56,8 +56,6 @@ public class Book {
         this.author = author;
     }
 
-
-
     public String getLanguage() {
         return language;
     }
